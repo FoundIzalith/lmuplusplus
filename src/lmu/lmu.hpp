@@ -19,12 +19,12 @@ public:
     LMUCell(int, int, int, int); //Generate by parameters 
     ~LMUCell();
 
-    void processInput(arma::Cube<float> input); //Sets hidden and memory states
+    void processInput(const arma::Cube<float> input&); //Sets hidden and memory states
 
-    ostream& operator<<(ostream& os, LMUCell); //Write
+    ostream& operator<<(ostream& os, const LMUCell&); //Write
 
 protected:
-    matrices discretizedMatrix, baseMatrix; //Matrices 
+    arma::Mat<float> *matrixA, *matrixB; //Matrices 
     arma::Mat<float> *hiddenState;
     arma::Mat<float> *memoryVector; 
 
@@ -43,9 +43,9 @@ public:
     LMULayer(int, int, int, int);
     ~LMULayer();
 
-    void processInput(arma::Cube<float> input);
+    void processInput(const arma::Cube<float> input&);
 
-    ostream& operator<<(ostream& os, LMULayer); //Write
+    ostream& operator<<(ostream& os, const LMULayer&); //Write
 
 protected:
     LMUCell *cell; 
@@ -66,8 +66,23 @@ protected:
 //Paralellized LMU layer 
 class LMUFFT {
 public:
+    LMUFFT();
+    LMUFFT(const LMUFFT&);
+    LMUFFT(int, int, int, int, int);
+    ~LMUFFT();
+
+    void processInput(const arma::Cube<float> input&);
+    void computeImpulse(); 
 
 protected:
+    arma::Mat<float> *matrixA, *matrixB, *matrixH
+
+    //Parameters
+    int inputSize; //Size of input vector
+    int hiddenSize; //Size of hidden vector
+    int memorySize; //Size of memory vector (Number of ODEs)
+    int sequenceLength; //Length of sequence
+    int theta; //Number of timesteps in sliding window of time
 
 };
 
