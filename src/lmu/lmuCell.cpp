@@ -129,19 +129,23 @@ void LMUCell::discretizeMatrices() {
 
     matrixB = temp.row(memorySize);
     matrixB.resize(1, memorySize);
-
 }
 
 void LMUCell::processInput(const arma::Mat<float> input&, const arma::Mat<float> stateH&, const arma::Mat<float> stateM&) {
     //Feed forward
-
     int batchSize = input.rows();
 
     hiddenState = stateH;
     memoryVector = stateM;
 
     //Equation 7 [1]
-    float u = tanh()
+    float u = (input * encodingInput.t()) + (hiddenState * encodingHidden.t()) + (memoryVector * encodingMemory.t());
+
+    //Equation 4 [1]
+    memoryVector = (matrixA * memoryVector) + (matrixB * u);
+
+    //Equation 6 [1]
+    hiddenState = (input * kernelInput) + (hiddenState * kernelHidden) + (memoryVector * kernelMemory);
 }
 
 void LMUCell::initEncoders() {
