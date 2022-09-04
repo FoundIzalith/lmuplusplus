@@ -19,7 +19,10 @@ public:
     LMUCell(int, int, int, int); //Generate by parameters 
     ~LMUCell();
 
-    void processInput(const arma::Cube<float> input&); //Sets hidden and memory states
+    void processInput(const arma::Mat<float> input&); //Sets hidden and memory states
+
+    void initEncoders();
+    void initKernels();
 
     ostream& operator<<(ostream& os, const LMUCell&); //Write
 
@@ -27,6 +30,12 @@ protected:
     arma::Mat<float> *matrixA, *matrixB; //Matrices 
     arma::Mat<float> *hiddenState;
     arma::Mat<float> *memoryVector; 
+
+    //Encoders
+    arma::Mat<float> *encodingInput, *encodingHidden, *encodingMemory;
+
+    //Kernels 
+    arma::Mat<float> *kernelInput, *kernelHidden, *kernelMemory; 
 
     //Parameters
     int inputSize; //Size of input vector
