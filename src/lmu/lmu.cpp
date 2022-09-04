@@ -1,6 +1,8 @@
 #include <iostream>
 #include <math.h>
 #include <armadillo>
+#include <random>
+#include <chrono>
 #include "lmu.hpp"
 #include "matrixUtil.hpp"
 
@@ -85,9 +87,9 @@ void LMUCell::initEncoders() {
     encodingHidden = new arma::Mat<float>(1, hiddenSize);
     encodingMemory = new arma::Mat<float>(1, memorySize);
 
-    //LeCun Uniform [5]
-    //Used to initialize weights such that they are not too big but not too small 
-    
+    LeCunUniform(encodingInput, inputSize);
+    LeCunUniform(encodingHidden, hiddenSize);
+    LeCunUniform(encodingMemory, memorySize);
 }
 
 void LMUCell::initKernels() {
@@ -96,4 +98,24 @@ void LMUCell::initKernels() {
     kernelMemory = new arma::Mat<float>(hiddenSize, memorySize);
 
     //Xavier Initialization [6]
+}
+
+void LeCunUniform(arma::Mat<float>& matrix, int size) {
+    //LeCun Uniform Distribution [5] (Section 1.4.6)
+    //Used to initialize weights such that they are not too big but not too small 
+
+    /*Given the fact that the LMU utilizes only a single cell
+    per layer, I'm pretty sure the fan in is just the input size*/
+    float limit = sqrt(3/inputSize);
+
+    srand(system_clock::now().time_since_epoch());
+
+    float sample = 0;
+
+    //I know that every matrix inputted here has just 1 row
+    for(int i = 0; i < size; i++) {
+        //Get sample on interval [-limit, limit]
+        sample = (rand() % (limit * 2)) - limit; 
+        matrix.at(0, i) = sample; 
+    }
 }

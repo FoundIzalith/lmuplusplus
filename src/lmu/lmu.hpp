@@ -24,6 +24,8 @@ public:
     void initEncoders();
     void initKernels();
 
+    void LeCunUniform(arma::Mat<float>&, int);
+
     ostream& operator<<(ostream& os, const LMUCell&); //Write
 
 protected:
