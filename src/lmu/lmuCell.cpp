@@ -78,6 +78,7 @@ LMUCell::~LMUCell() {
 }
 
 void LMUCell::generateMatrices() {
+    //Equation 2 [1]
     float Q[memorySize];
     float R[memorySize];
     arma::Mat<float matrix_I(memorySize, memorySize);
@@ -110,6 +111,24 @@ void LMUCell::generateMatrices() {
 }
 
 void LMUCell::discretizeMatrices() {
+    //Step 1. Combine A and B, pad out to create square matrix
+    //We need a square matrix to find the matrix exponential 
+    arma;:Mat<float> temp;
+    temp = matrixA.join_cols(matrixA, matrixB);
+    temp.resize(memorySize + 1, memorySize + 1);
+
+    //Step 2. Compute matrix exponential 
+    temp = expmat(temp);
+
+    //Step 3. Slice A and B back out of combined matrix
+    for(int i = 0; i < memorySize; i++) {
+        for(int j = 0; j < memorySize; j++) {
+            matrixA.at(i, j) = temp.at(i, j);
+        }
+    }
+
+    matrixB = temp.row(memorySize);
+    matrixB.resize(1, memorySize);
 
 }
 
