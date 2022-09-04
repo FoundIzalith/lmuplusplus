@@ -97,7 +97,9 @@ void LMUCell::initKernels() {
     kernelHidden = new arma::Mat<float>(hiddenSize, hiddenSize);
     kernelMemory = new arma::Mat<float>(hiddenSize, memorySize);
 
-    //Xavier Initialization [6]
+    xavierInit(kernelInput, hiddenSize, inputSize);
+    xavierInit(kernelHidden, hiddenSize, hiddenSize);
+    xavierInit(kernelMemory, hiddenSize, memorySize);
 }
 
 void LeCunUniform(arma::Mat<float>& matrix, int size) {
@@ -110,12 +112,28 @@ void LeCunUniform(arma::Mat<float>& matrix, int size) {
 
     srand(system_clock::now().time_since_epoch());
 
-    float sample = 0;
+    float sample;
 
     //I know that every matrix inputted here has just 1 row
     for(int i = 0; i < size; i++) {
         //Get sample on interval [-limit, limit]
         sample = (rand() % (limit * 2)) - limit; 
         matrix.at(0, i) = sample; 
+    }
+}
+
+void xavierInit(arma::Mat<float>& matrix, int rows, int cols) {
+    //Xavier Normal Initialization [6]
+
+    //# of inputs and outputs should be the same 
+
+    float mean = 0;
+    float standardDeviation = sqrt(2/(2*inputSize));
+    std::normal_distribution<float> distribution(mean, standardDeviation);
+
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            matrix.at(i, j) = distribution(system_clock::now().time_since_epoch());
+        }
     }
 }

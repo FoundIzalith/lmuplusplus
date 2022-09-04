@@ -24,7 +24,8 @@ public:
     void initEncoders();
     void initKernels();
 
-    void LeCunUniform(arma::Mat<float>&, int);
+    void LeCunUniform(arma::Mat<float>&, int size);
+    void xavierInit(arma::Mat<float>&, int rows, int cols);
 
     ostream& operator<<(ostream& os, const LMUCell&); //Write
 
