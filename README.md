@@ -27,3 +27,5 @@ Chilkuri, Narsimha & Eliasmith, Chris. [Parallelizing Legendre Memory Unit Train
 Conrad Sanderson and Ryan Curtin. [Armadillo: a template-based C++ library for linear algebra](http://arma.sourceforge.net/armadillo_joss_2016.pdf). Journal of Open Source Software, Vol. 1, pp. 26, 2016.
 
 Conrad Sanderson and Ryan Curtin. [A User-Friendly Hybrid Sparse Matrix Class in C++](http://arma.sourceforge.net/armadillo_lncs_2018.pdf). Lecture Notes in Computer Science (LNCS), Vol. 10931, pp. 422-430, 2018.
+
+LeCun, Y.A., Bottou, L., Orr, G.B., Müller, KR. [Efficient BackProp](https://link.springer.com/chapter/10.1007/978-3-642-35289-8_3). Neural Networks: Tricks of the Trade. Lecture Notes in Computer Science, vol 7700, 2012. 
