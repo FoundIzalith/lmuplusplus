@@ -19,7 +19,9 @@ public:
     LMUCell(int, int, int, int); //Generate by parameters 
     ~LMUCell();
 
-    void processInput(const arma::Mat<float> input&); //Sets hidden and memory states
+    void generateMatrices();
+    void discretizeMatrices();
+    void processInput(const arma::Mat<float> input&, const arma::Mat<float> stateH&, const arma::Mat<float> stateM&); //Sets hidden and memory states
 
     void initEncoders();
     void initKernels();

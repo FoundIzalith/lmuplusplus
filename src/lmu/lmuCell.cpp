@@ -52,8 +52,8 @@ LMUCell::LMUCell(int i, int h, int m, int t) {
     memorySize = m;
     theta = t;
 
-    matrices AB = generateMatrices(memorySize, theta);
-    discretizeMatrices(matrixA, matrixB, memorySize);
+    generateMatrices();
+    discretizeMatrices();
 
     initEncoders();
     initKernels();
@@ -77,9 +77,52 @@ LMUCell::~LMUCell() {
     delete kernelMemory;
 }
 
-void LMUCell::processInput(const arma::Mat<float> input&) {
+void LMUCell::generateMatrices() {
+    float Q[memorySize];
+    float R[memorySize];
+    arma::Mat<float matrix_I(memorySize, memorySize);
+    arma::Mat<float> matrix_J(memorySize, memorySize);
+
+    float result = 0;
+    for(int i = 0; i < memorySize; i++) {
+        //Step 1: create array Q with discrete elements
+        Q[i] = i;
+        //Step 2: create array R equal to 2 * Q + 1
+        R[i] = (2 * i) + 1;
+
+        //Step 3: create 2 matrices which are essentially just lines of Q
+        for(int j = 0; j < memorySize; j++) {
+            matrix_I.at(i, j) = Q[i]; //Ascending vertical
+            matrix_J.at(i, j) = Q[j]; //Ascending horizontal
+
+            //Step 4: use I and J to build A and B
+            if(matrix_I.at(i, j) < matrix_J.at(i, j)) {
+                result = pow(-1.0, matrix_I.at(i, j) - matrix_J.at(i, j) - 1);
+                matrixA.at(i, j) = result;
+            }
+
+            result = pow(-1.0, matrix_I.at(i, j) * matrix_J.at(i, j));
+            matrixB.at(i, j) = result;
+        }
+    }
+
+    discretizeMatrices();
+}
+
+void LMUCell::discretizeMatrices() {
+
+}
+
+void LMUCell::processInput(const arma::Mat<float> input&, const arma::Mat<float> stateH&, const arma::Mat<float> stateM&) {
+    //Feed forward
+
+    int batchSize = input.rows();
+
+    hiddenState = stateH;
+    memoryVector = stateM;
+
     //Equation 7 [1]
-    //arma::Mat<float> u = 
+    float u = tanh()
 }
 
 void LMUCell::initEncoders() {
