@@ -4,7 +4,7 @@
 #include <random>
 #include <chrono>
 #include "lmu.hpp"
-#include "matrixUtil.hpp"
+
 
 LMUCell::LMUCell() {
     matrixA = 0;
@@ -27,10 +27,10 @@ LMUCell::LMUCell() {
 }
 
 LMUCell::LMUCell(const LMUCell& original) {
-    matrixA = new arma::Mat<float>(original.matrixA);
-    matrixB = new arma::Mat<float>(original.matrixB);
-    hiddenState = new arma::Mat<float>(original.hiddenState);
-    memoryVector = new arma::Mat<float>(original.memoryVector);
+    matrixA = new arma::Mat<float>(*original.matrixA);
+    matrixB = new arma::Mat<float>(*original.matrixB);
+    hiddenState = new arma::Mat<float>(*original.hiddenState);
+    memoryVector = new arma::Mat<float>(*original.memoryVector);
 
     encodingInput = original.encodingInput;
     encodingHidden = original.encodingHidden;
@@ -81,7 +81,7 @@ void LMUCell::generateMatrices() {
     //Equation 2 [1]
     float Q[memorySize];
     float R[memorySize];
-    arma::Mat<float matrix_I(memorySize, memorySize);
+    arma::Mat<float> matrix_I(memorySize, memorySize);
     arma::Mat<float> matrix_J(memorySize, memorySize);
 
     float result = 0;
@@ -99,11 +99,11 @@ void LMUCell::generateMatrices() {
             //Step 4: use I and J to build A and B
             if(matrix_I.at(i, j) < matrix_J.at(i, j)) {
                 result = pow(-1.0, matrix_I.at(i, j) - matrix_J.at(i, j) - 1);
-                matrixA.at(i, j) = result;
+                matrixA->at(i, j) = result;
             }
 
             result = pow(-1.0, matrix_I.at(i, j) * matrix_J.at(i, j));
-            matrixB.at(i, j) = result;
+            matrixB->at(i, j) = result;
         }
     }
 
@@ -113,8 +113,8 @@ void LMUCell::generateMatrices() {
 void LMUCell::discretizeMatrices() {
     //Step 1. Combine A and B, pad out to create square matrix
     //We need a square matrix to find the matrix exponential 
-    arma;:Mat<float> temp;
-    temp = matrixA.join_cols(matrixA, matrixB);
+    arma::Mat<float> temp;
+    temp = arma::Mat::join_cols(matrixA, matrixB);
     temp.resize(memorySize + 1, memorySize + 1);
 
     //Step 2. Compute matrix exponential 
@@ -123,29 +123,33 @@ void LMUCell::discretizeMatrices() {
     //Step 3. Slice A and B back out of combined matrix
     for(int i = 0; i < memorySize; i++) {
         for(int j = 0; j < memorySize; j++) {
-            matrixA.at(i, j) = temp.at(i, j);
+            matrixA->at(i, j) = temp.at(i, j);
         }
     }
 
-    matrixB = temp.row(memorySize);
-    matrixB.resize(1, memorySize);
+    delete matrixB;
+    matrixB = new arma::Mat<float>(temp.row(memorySize));
+    matrixB->resize(1, memorySize);
 }
 
-void LMUCell::processInput(const arma::Mat<float> input&, const arma::Mat<float> stateH&, const arma::Mat<float> stateM&) {
+void LMUCell::processInput(const arma::Mat<float>& input, const arma::Mat<float>& prevH, const arma::Mat<float>& prevM) {
+    //input is input. prevH is hiddenState (t - 1). prevM is memoryVector (t - 1)
+    //The paper [1] can help make the purpose of this function more clear.
     //Feed forward
-    int batchSize = input.rows();
-
-    hiddenState = stateH;
-    memoryVector = stateM;
-
+    int batchSize = input.n_rows;
+    
     //Equation 7 [1]
-    float u = (input * encodingInput.t()) + (hiddenState * encodingHidden.t()) + (memoryVector * encodingMemory.t());
+    //u = (e_x^T * x_t) + (e_h^T * h_t-1) + (e_m^T * m_t-1)
+    float u = (input * encodingInput->t()) + (prevH * encodingHidden->t()) + (prevM * encodingMemory->t());
 
     //Equation 4 [1]
-    memoryVector = (matrixA * memoryVector) + (matrixB * u);
+    //m = (A * m_t-1) + (B * u) 
+    memoryVector = (matrixA * &prevM) + matrixB->transform( [&u](float n) { return (n * u); });
 
     //Equation 6 [1]
-    hiddenState = (input * kernelInput) + (hiddenState * kernelHidden) + (memoryVector * kernelMemory);
+    //h = f((W_x * x_t) * (W_h * h_t-1) + (W_m * m_t)), where f() is a chosen nonlinearity, in our case tanh  
+    hiddenState = (&input * kernelInput) + (&prevH * kernelHidden) + (&prevM * kernelMemory);
+    hiddenState = tanh(hiddenState);
 }
 
 void LMUCell::initEncoders() {
@@ -153,9 +157,9 @@ void LMUCell::initEncoders() {
     encodingHidden = new arma::Mat<float>(1, hiddenSize);
     encodingMemory = new arma::Mat<float>(1, memorySize);
 
-    LeCunUniform(encodingInput, inputSize);
-    LeCunUniform(encodingHidden, hiddenSize);
-    LeCunUniform(encodingMemory, memorySize);
+    LeCunUniform(*encodingInput, inputSize);
+    LeCunUniform(*encodingHidden, hiddenSize);
+    LeCunUniform(*encodingMemory, memorySize);
 }
 
 void LMUCell::initKernels() {
@@ -163,12 +167,12 @@ void LMUCell::initKernels() {
     kernelHidden = new arma::Mat<float>(hiddenSize, hiddenSize);
     kernelMemory = new arma::Mat<float>(hiddenSize, memorySize);
 
-    xavierInit(kernelInput, hiddenSize, inputSize);
-    xavierInit(kernelHidden, hiddenSize, hiddenSize);
-    xavierInit(kernelMemory, hiddenSize, memorySize);
+    xavierInit(*kernelInput, hiddenSize, inputSize);
+    xavierInit(*kernelHidden, hiddenSize, hiddenSize);
+    xavierInit(*kernelMemory, hiddenSize, memorySize);
 }
 
-void LeCunUniform(arma::Mat<float>& matrix, int size) {
+void LMUCell::LeCunUniform(arma::Mat<float>& matrix, int size) {
     //LeCun Uniform Distribution [5] (Section 1.4.6)
     //Used to initialize weights such that they are not too big but not too small 
 
@@ -176,19 +180,19 @@ void LeCunUniform(arma::Mat<float>& matrix, int size) {
     per layer, I'm pretty sure the fan in is just the input size*/
     float limit = sqrt(3/inputSize);
 
-    srand(system_clock::now().time_since_epoch());
+    std::srand(std::chrono::system_clock::now());
 
     float sample;
 
     //I know that every matrix inputted here has just 1 row
     for(int i = 0; i < size; i++) {
         //Get sample on interval [-limit, limit]
-        sample = (rand() % (limit * 2)) - limit; 
+        sample = (std::rand() % (limit * 2.0)) - limit; 
         matrix.at(0, i) = sample; 
     }
 }
 
-void xavierInit(arma::Mat<float>& matrix, int rows, int cols) {
+void LMUCell::xavierInit(arma::Mat<float>& matrix, int rows, int cols) {
     //Xavier Normal Initialization [6]
 
     //# of inputs and outputs should be the same 
@@ -199,7 +203,7 @@ void xavierInit(arma::Mat<float>& matrix, int rows, int cols) {
 
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
-            matrix.at(i, j) = distribution(system_clock::now().time_since_epoch());
+            matrix.at(i, j) = distribution(std::chrono::system_clock::now());
         }
     }
 }
