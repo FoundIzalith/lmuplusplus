@@ -8,6 +8,7 @@
 LMULayer::LMULayer() {
     cell = 0;
     hiddenState = 0;
+    memoryVector = 0;
     output = 0;
 
     inputSize = 0;
@@ -21,7 +22,8 @@ LMULayer::LMULayer() {
 
 LMULayer::LMULayer(const LMULayer& original) {
     cell = new LMUCell(original.cell);
-    hiddenState = new Mat<float>(original.hiddenState)
+    hiddenState = new Mat<float>(original.hiddenState);
+    memoryVector = new Mat<float>(original.memoryVector);
     output = new Cube<float>(original.output);
 
     inputSize = original.inputSize;
@@ -45,5 +47,19 @@ LMULayer::LMULayer(int i, int h, int m, int t) {
 LMULayer::~LMULayer() {
     delete cell;
     delete hiddenState;
+    delete memoryVector;
     delete output;
+}
+
+void LMULayer::processInput(const arma::Cube<float>& input) {
+    batchSize = input.n_rows;
+    sequenceLength = input.n_cols;
+
+    hiddenState = new arma::Mat<float>(batchSize, hiddenSize);
+    memoryVector = new arma::Mat<float>(batchSize, memorySize);
+    output = new arma::Cube<float>(sequenceLength, batchSize, hiddenSize);
+    
+    for(int i = 0; i < sequenceLength; i++) {
+        cell.processInput(input, hiddenState, memoryVector);
+    }
 }
