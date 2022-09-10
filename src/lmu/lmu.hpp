@@ -6,7 +6,6 @@
 #include <vector>
 #include <math.h>
 #include <armadillo>
-#include "matrixUtil.hpp"
 
 #ifndef GUANSLAB_LMUPLUSPLUS
 #define GUANSLAB_LMUPLUSPLUS
@@ -21,7 +20,8 @@ public:
 
     void generateMatrices();
     void discretizeMatrices();
-    void processInput(const arma::Mat<float> input&, const arma::Mat<float> stateH&, const arma::Mat<float> stateM&); //Sets hidden and memory states
+    //Sets hidden and memory states
+    void processInput(const arma::Mat<float>& input, arma::Mat<float>& prevH, arma::Mat<float>& prevM); 
 
     void initEncoders();
     void initKernels();
@@ -29,12 +29,10 @@ public:
     void LeCunUniform(arma::Mat<float>&, int size);
     void xavierInit(arma::Mat<float>&, int rows, int cols);
 
-    ostream& operator<<(ostream& os, const LMUCell&); //Write
+    std::ostream& operator<<(std::ostream& os); //Write
 
 protected:
     arma::Mat<float> *matrixA, *matrixB; //Matrices 
-    arma::Mat<float> *hiddenState;
-    arma::Mat<float> *memoryVector; 
 
     //Encoders
     arma::Mat<float> *encodingInput, *encodingHidden, *encodingMemory;
@@ -57,9 +55,9 @@ public:
     LMULayer(int, int, int, int);
     ~LMULayer();
 
-    void processInput(const arma::Cube<float> input&);
+    void processInput(const arma::Cube<float>& input);
 
-    ostream& operator<<(ostream& os, const LMULayer&); //Write
+    std::ostream& operator<<(std::ostream& os); //Write
 
 protected:
     LMUCell *cell; 
@@ -85,11 +83,11 @@ public:
     LMUFFT(int, int, int, int, int);
     ~LMUFFT();
 
-    void processInput(const arma::Cube<float> input&);
+    void processInput(const arma::Cube<float>& input);
     void computeImpulse(); 
 
 protected:
-    arma::Mat<float> *matrixA, *matrixB, *matrixH
+    arma::Mat<float> *matrixA, *matrixB, *matrixH;
 
     //Parameters
     int inputSize; //Size of input vector

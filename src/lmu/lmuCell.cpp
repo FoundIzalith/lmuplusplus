@@ -9,8 +9,6 @@
 LMUCell::LMUCell() {
     matrixA = 0;
     matrixB = 0;
-    hiddenState = 0;
-    memoryVector = 0;
 
     encodingInput = 0;
     encodingHidden = 0;
@@ -29,8 +27,6 @@ LMUCell::LMUCell() {
 LMUCell::LMUCell(const LMUCell& original) {
     matrixA = new arma::Mat<float>(*original.matrixA);
     matrixB = new arma::Mat<float>(*original.matrixB);
-    hiddenState = new arma::Mat<float>(*original.hiddenState);
-    memoryVector = new arma::Mat<float>(*original.memoryVector);
 
     encodingInput = original.encodingInput;
     encodingHidden = original.encodingHidden;
@@ -58,16 +54,11 @@ LMUCell::LMUCell(int i, int h, int m, int t) {
 
     initEncoders();
     initKernels();
-
-    hiddenState = 0;
-    memoryVector = 0;
 }
 
 LMUCell::~LMUCell() {
     delete matrixA;
     delete matrixB;
-    delete hiddenState;
-    delete memoryVector;
 
     delete encodingInput;
     delete encodingHidden;
@@ -113,7 +104,7 @@ void LMUCell::discretizeMatrices() {
     //Step 1. Combine A and B, pad out to create square matrix
     //We need a square matrix to find the matrix exponential 
     arma::Mat<float> temp;
-    temp = arma::Mat::join_cols(matrixA, matrixB);
+    temp = arma::join_cols(matrixA, matrixB);
     temp.resize(memorySize + 1, memorySize + 1);
 
     //Step 2. Compute matrix exponential 
@@ -131,24 +122,34 @@ void LMUCell::discretizeMatrices() {
     matrixB->resize(1, memorySize);
 }
 
-void LMUCell::processInput(const arma::Mat<float>& input, const arma::Mat<float>& prevH, const arma::Mat<float>& prevM) {
+void LMUCell::processInput(const arma::Mat<float>& input, arma::Mat<float>& prevH, arma::Mat<float>& prevM) {
     //input is input. prevH is hiddenState (t - 1). prevM is memoryVector (t - 1)
     //The paper [1] can help make the purpose of this function more clear.
     //Feed forward
     int batchSize = input.n_rows;
+
+    arma::Mat<float> *hiddenState = new arma::Mat<float>(batchSize, hiddenSize);
+    arma::Mat<float> *memoryVector = new arma::Mat<float>(batchSize, memorySize);
     
     //Equation 7 [1]
     //u = (e_x^T * x_t) + (e_h^T * h_t-1) + (e_m^T * m_t-1)
-    float u = (input * encodingInput->t()) + (prevH * encodingHidden->t()) + (prevM * encodingMemory->t());
+    arma::Mat<float> u(batchSize, 1);
+    u = input * encodingInput->t() + (prevH * encodingHidden->t()) + (prevM * encodingMemory->t());
 
     //Equation 4 [1]
     //m = (A * m_t-1) + (B * u) 
-    memoryVector = (matrixA * &prevM) + matrixB->transform( [&u](float n) { return (n * u); });
+    memoryVector = (*matrixA * prevM) + (*matrixB * u);
 
     //Equation 6 [1]
     //h = f((W_x * x_t) * (W_h * h_t-1) + (W_m * m_t)), where f() is a chosen nonlinearity, in our case tanh  
-    hiddenState = (&input * kernelInput) + (&prevH * kernelHidden) + (&prevM * kernelMemory);
-    hiddenState = tanh(hiddenState);
+    hiddenState = (input * *kernelInput) + (prevH * *kernelHidden) + (prevM * *kernelMemory);
+    hiddenState->transform( [](float n) { return tanh(n); });
+
+    //We set these for the next cycle 
+    delete *prevH;
+    prevH = *hiddenState;
+    delete *prevM;
+    prevM = *memoryVector;
 }
 
 void LMUCell::initEncoders() {
@@ -186,7 +187,7 @@ void LMUCell::LeCunUniform(arma::Mat<float>& matrix, int size) {
     //I know that every matrix inputted here has just 1 row
     for(int i = 0; i < size; i++) {
         //Get sample on interval [-limit, limit]
-        sample = (std::rand() % (limit * 2.0)) - limit; 
+        sample = (std::rand() % (int)(limit * 2)) - limit; 
         matrix.at(0, i) = sample; 
     }
 }
