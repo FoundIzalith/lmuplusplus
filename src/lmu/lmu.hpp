@@ -18,8 +18,6 @@ public:
     LMUCell(int, int, int, int); //Generate by parameters 
     ~LMUCell();
 
-    void generateMatrices();
-    void discretizeMatrices();
     //Sets hidden and memory states
     void processInput(const arma::Mat<float>& input, arma::Mat<float>& prevH, arma::Mat<float>& prevM); 
 
@@ -61,7 +59,7 @@ public:
 
 protected:
     LMUCell *cell; 
-    arma::Mat<float> *hiddenState; 
+    arma::Mat<float> *hiddenState, *memoryVector; 
     arma::Cube<float> *output;
 
     //Parameters
@@ -98,5 +96,7 @@ protected:
 
 };
 
+void generateMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
+void discretizeMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
 
 #endif 
