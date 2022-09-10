@@ -2,9 +2,8 @@
 #include <math.h>
 #include <armadillo>
 #include <random>
-#include <chrono>
+#include <time.h>
 #include "lmu.hpp"
-
 
 LMUCell::LMUCell() {
     matrixA = 0;
@@ -104,7 +103,7 @@ void LMUCell::discretizeMatrices() {
     //Step 1. Combine A and B, pad out to create square matrix
     //We need a square matrix to find the matrix exponential 
     arma::Mat<float> temp;
-    temp = arma::join_cols(matrixA, matrixB);
+    temp = arma::join_cols(*matrixA, *matrixB);
     temp.resize(memorySize + 1, memorySize + 1);
 
     //Step 2. Compute matrix exponential 
@@ -128,8 +127,8 @@ void LMUCell::processInput(const arma::Mat<float>& input, arma::Mat<float>& prev
     //Feed forward
     int batchSize = input.n_rows;
 
-    arma::Mat<float> *hiddenState = new arma::Mat<float>(batchSize, hiddenSize);
-    arma::Mat<float> *memoryVector = new arma::Mat<float>(batchSize, memorySize);
+    arma::Mat<float> hiddenState(batchSize, hiddenSize);
+    arma::Mat<float> memoryVector(batchSize, memorySize);
     
     //Equation 7 [1]
     //u = (e_x^T * x_t) + (e_h^T * h_t-1) + (e_m^T * m_t-1)
@@ -143,13 +142,11 @@ void LMUCell::processInput(const arma::Mat<float>& input, arma::Mat<float>& prev
     //Equation 6 [1]
     //h = f((W_x * x_t) * (W_h * h_t-1) + (W_m * m_t)), where f() is a chosen nonlinearity, in our case tanh  
     hiddenState = (input * *kernelInput) + (prevH * *kernelHidden) + (prevM * *kernelMemory);
-    hiddenState->transform( [](float n) { return tanh(n); });
+    hiddenState.transform( [](float n) { return tanh(n); });
 
     //We set these for the next cycle 
-    delete *prevH;
-    prevH = *hiddenState;
-    delete *prevM;
-    prevM = *memoryVector;
+    prevH = hiddenState;
+    prevM = memoryVector;
 }
 
 void LMUCell::initEncoders() {
@@ -180,7 +177,7 @@ void LMUCell::LeCunUniform(arma::Mat<float>& matrix, int size) {
     per layer, I'm pretty sure the fan in is just the input size*/
     float limit = sqrt(3/inputSize);
 
-    std::srand(std::chrono::system_clock::now());
+    std::srand(time(NULL));
 
     float sample;
 
@@ -199,11 +196,14 @@ void LMUCell::xavierInit(arma::Mat<float>& matrix, int rows, int cols) {
 
     float mean = 0;
     float standardDeviation = sqrt(2/(2*inputSize));
-    std::normal_distribution<float> distribution(mean, standardDeviation);
 
+    unsigned seed = time(NULL);
+    std::default_random_engine random(seed);
+    std::normal_distribution<float> distribution(mean, standardDeviation);
+    std::srand(time(NULL));
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
-            matrix.at(i, j) = distribution(std::chrono::system_clock::now());
+            matrix.at(i, j) = distribution(random);
         }
     }
 }
