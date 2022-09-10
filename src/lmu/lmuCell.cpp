@@ -46,6 +46,7 @@ LMUCell::LMUCell(const LMUCell& original) {
     theta = original.theta;
 }
 
+//This is the constructor which actually gets called by the LMULayer
 LMUCell::LMUCell(int i, int h, int m, int t) {
     inputSize = i;
     hiddenSize = h;
@@ -106,8 +107,6 @@ void LMUCell::generateMatrices() {
             matrixB->at(i, j) = result;
         }
     }
-
-    discretizeMatrices();
 }
 
 void LMUCell::discretizeMatrices() {
