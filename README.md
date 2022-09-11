@@ -1,6 +1,8 @@
 This is an implementation of the Legendre Memory Unit using C++.
 
-The Legendre Memory Unit is a novel Recurrent Neural Network design capable of achieving very fast speeds using few resources. Unlike other RNNs, it is capable of being parallelized with some modifications. This allows us to perform complex analysis with neural networks using relatively few computational resources.  
+The Legendre Memory Unit is a novel Recurrent Neural Network design capable of achieving very fast speeds using few resources. Unlike other RNNs, it is capable of being parallelized with some modifications. This allows us to perform complex analysis with neural networks using relatively few computational resources. 
+
+Implementing the LMU in C++ provides us to be as efficient as possible. This is essential for both large scale implementations on servers, and small scale implementations on weak hardware. 
 
 **This project is currently unfinished and does not yet function.**
 
@@ -21,6 +23,10 @@ Armadillo - a linear algebra and scientific computing library. Version 11.2.3
 
 ## References
 
+Original implementation of the LMU: [nengo/keras-lmu](https://github.com/nengo/keras-lmu)
+
+Implementation of the parallelized LMU: [hrshtv/pytorch-lmu](https://github.com/hrshtv/pytorch-lmu)
+
 [1] Voelker, Kajic, Eliasmith. [Legendre Memory Units: Continuous-Time Representation in Recurrent Neural Networks](https://proceedings.neurips.cc/paper/2019/file/952285b9b7e7a1be5aa7849f32ffff05-Paper.pdf). Advances in Neural Information Processing Systems, Vol. 32, 2019. 
 
 [2] Chilkuri, Narsimha & Eliasmith, Chris. [Parallelizing Legendre Memory Unit Training](https://www.researchgate.net/publication/349546847_Parallelizing_Legendre_Memory_Unit_Training). 2021. 
@@ -33,9 +39,4 @@ Armadillo - a linear algebra and scientific computing library. Version 11.2.3
 
 [6] Xavier Glorot, Yoshua Bengio. [Understanding the difficulty of training deep feedforward neural networks](http://proceedings.mlr.press/v9/glorot10a.html). Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics, PMLR 9:249-256, 2010. 
 
-[7] E. O. Brigham and R. E. Morrow. [The fast Fourier transform](https://ieeexplore.ieee.org/abstract/document/5217220). IEEE Spectrum, Vol 4., no. 12, pp. 63-70, 1967.
-
-Original implementation of the LMU: [nengo/keras-lmu](https://github.com/nengo/keras-lmu)
-
-Implementation of the parallelized LMU: [hrshtv/pytorch-lmu](https://github.com/hrshtv/pytorch-lmu)
 
