@@ -1,8 +1,8 @@
 This is an implementation of the Legendre Memory Unit using C++.
 
-The Legendre Memory Unit is a novel Recurrent Neural Network design capable of achieving very fast speeds using few resources. It utilizes a sliding window of time, onto which the continuous time history of the network is orthogonally mapped. 
+The Legendre Memory Unit is a novel Recurrent Neural Network design capable of achieving very fast speeds using few resources. Unlike other RNNs, it is capable of being parallelized with some modifications. This allows us to perform complex analysis with neural networks using relatively few computational resources.  
 
-**This project is currently unfinished and does not function.**
+**This project is currently unfinished and does not yet function.**
 
 ## Make 
 
@@ -11,14 +11,15 @@ This program can be built using **make**.
 Make targets:
 * **lmu**  -            Compiles LMU code
 * **client** -          Compile a standalone client with a terminal interface
-* **embedded** -        Compile with wrappers for JavaScript, for use in larger applications 
+* **jsbind** -          Compile with wrappers for JavaScript
+* **pybind** -          Compile with wrappers for Python 
 * **tests** -           Compile and run tests 
 * **clean**  -          Removes all generated files
 
 ## Dependencies
 Armadillo - a linear algebra and scientific computing library. Version 11.2.3
 
-## Bibliography
+## References
 
 [1] Voelker, Kajic, Eliasmith. [Legendre Memory Units: Continuous-Time Representation in Recurrent Neural Networks](https://proceedings.neurips.cc/paper/2019/file/952285b9b7e7a1be5aa7849f32ffff05-Paper.pdf). Advances in Neural Information Processing Systems, Vol. 32, 2019. 
 
@@ -28,6 +29,13 @@ Armadillo - a linear algebra and scientific computing library. Version 11.2.3
 
 [4] Conrad Sanderson and Ryan Curtin. [A User-Friendly Hybrid Sparse Matrix Class in C++](http://arma.sourceforge.net/armadillo_lncs_2018.pdf). Lecture Notes in Computer Science (LNCS), Vol. 10931, pp. 422-430, 2018.
 
-[5] LeCun, Y.A., Bottou, L., Orr, G.B., Müller, KR. [Efficient BackProp](https://link.springer.com/chapter/10.1007/978-3-642-35289-8_3). Neural Networks: Tricks of the Trade. Lecture Notes in Computer Science, vol 7700, 2012. 
+[5] LeCun, Y.A., Bottou, L., Orr, G.B., Müller, KR. [Efficient BackProp](https://link.springer.com/chapter/10.1007/978-3-642-35289-8_3). Neural Networks: Tricks of the Trade. Lecture Notes in Computer Science, Vol. 7700, 2012. 
 
 [6] Xavier Glorot, Yoshua Bengio. [Understanding the difficulty of training deep feedforward neural networks](http://proceedings.mlr.press/v9/glorot10a.html). Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics, PMLR 9:249-256, 2010. 
+
+[7] E. O. Brigham and R. E. Morrow. [The fast Fourier transform](https://ieeexplore.ieee.org/abstract/document/5217220). IEEE Spectrum, Vol 4., no. 12, pp. 63-70, 1967.
+
+Original implementation of the LMU: [nengo/keras-lmu](https://github.com/nengo/keras-lmu)
+
+Implementation of the parallelized LMU: [hrshtv/pytorch-lmu](https://github.com/hrshtv/pytorch-lmu)
+
