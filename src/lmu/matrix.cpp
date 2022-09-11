@@ -1,3 +1,5 @@
+//This file contains some functions used for manipulating matrices
+
 #include <iostream>
 #include <math.h>
 #include <armadillo>
@@ -54,4 +56,10 @@ void discretizeMatrices(arma::Mat<float> *matrixA, arma::Mat<float> *matrixB, in
     delete matrixB;
     matrixB = new arma::Mat<float>(temp.row(memorySize));
     matrixB->resize(1, memorySize);
+}
+
+//Rectified Linear Unit
+float reLU(float n) {
+    if(n < 0) return 0;
+    else return n;
 }
