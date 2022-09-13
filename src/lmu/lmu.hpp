@@ -73,7 +73,7 @@ protected:
     int sequenceLength;
 };
 
-//Paralellized LMU layer 
+//Parallelized LMU layer 
 class LMUFFT {
 public:
     LMUFFT();
@@ -85,7 +85,7 @@ public:
     void computeImpulse(); 
 
 protected:
-    arma::Mat<float> *matrixA, *matrixB, *matrixH;
+    arma::Mat<float> *matrixA, *matrixB, *matrixH, *hFFT;
 
     //Parameters
     int inputSize; //Size of input vector
@@ -94,9 +94,12 @@ protected:
     int sequenceLength; //Length of sequence
     int theta; //Number of timesteps in sliding window of time
 
+    int batchSize;
+
 };
 
 void generateMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
 void discretizeMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
+float reLU(float);
 
 #endif 
