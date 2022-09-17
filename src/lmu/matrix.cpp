@@ -63,3 +63,40 @@ float reLU(float n) {
     if(n < 0) return 0;
     else return n;
 }        
+
+void LeCunUniform(arma::Mat<float>& matrix, int size) {
+    //LeCun Uniform Distribution [5] (Section 1.4.6)
+    //Used to initialize weights such that they are not too big but not too small 
+
+    /*Given the fact that the LMU utilizes only a single cell
+    per layer, I'm pretty sure the fan in is just the input size*/
+    float limit = sqrt(3/inputSize);
+
+    std::srand(time(NULL));
+
+    float sample;
+
+    //I know that every matrix inputted here has just 1 row
+    for(int i = 0; i < size; i++) {
+        //Get sample on interval [-limit, limit]
+        sample = (std::rand() % (int)(limit * 2)) - limit; 
+        matrix.at(0, i) = sample; 
+    }
+}
+
+void xavierInit(arma::Mat<float>& matrix, int rows, int cols) {
+    //Xavier Normal Initialization [6]
+    //# of inputs and outputs should be the same 
+    float mean = 0;
+    float standardDeviation = sqrt(2/(2*inputSize));
+
+    unsigned seed = time(NULL);
+    std::default_random_engine random(seed);
+    std::normal_distribution<float> distribution(mean, standardDeviation);
+    std::srand(time(NULL));
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            matrix.at(i, j) = distribution(random);
+        }
+    }
+}

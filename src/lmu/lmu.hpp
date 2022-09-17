@@ -10,7 +10,7 @@
 #ifndef GUANSLAB_LMUPLUSPLUS
 #define GUANSLAB_LMUPLUSPLUS
 
-//Basic memory cell
+//Basic memory cell [1]
 class LMUCell {
 public:
     LMUCell();
@@ -23,9 +23,6 @@ public:
 
     void initEncoders();
     void initKernels();
-
-    void LeCunUniform(arma::Mat<float>&, int size);
-    void xavierInit(arma::Mat<float>&, int rows, int cols);
 
     std::ostream& operator<<(std::ostream& os); //Write
 
@@ -45,7 +42,7 @@ protected:
     int theta; //Number of timesteps in sliding window of time 
 };
 
-//Standard LMU layer
+//Standard LMU layer [1]
 class LMULayer {
 public:
     LMULayer();
@@ -73,7 +70,7 @@ protected:
     int sequenceLength;
 };
 
-//Parallelized LMU layer 
+//Parallelized LMU layer [2]
 class LMUFFT {
 public:
     LMUFFT();
@@ -101,5 +98,7 @@ protected:
 void generateMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
 void discretizeMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
 float reLU(float);
+void LeCunUniform(arma::Mat<float>&, int size);
+void xavierInit(arma::Mat<float>&, int rows, int cols);
 
 #endif 
