@@ -9,8 +9,8 @@
 class soundData {
 public:
     soundData();
-    soundData();
-    soundData(const soundDataset&);
+    soundData(std::string, int, int, int, int);
+    soundData(const soundData&);
     ~soundData();
 
     //Functions for external use
