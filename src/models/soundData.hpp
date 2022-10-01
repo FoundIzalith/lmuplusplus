@@ -9,12 +9,12 @@
 class soundData {
 public:
     soundData();
-    soundData(std::string, int, int, int, int);
+    soundData(std::string, std::string, int, int, int);
     soundData(const soundData&);
     ~soundData();
 
     //Functions for external use
-    void processAudio(std::string); //Path to directory
+    void processAudio(std::string); //File
     arma::Mat<float> getSpectrogram(); 
 
     //Implicitly called functions
@@ -22,11 +22,11 @@ public:
     void genSpectrogram();  //Takes samples and creates spectrogram 
     
 private:
-    std::string fileName; 
+    std::string fileName;
+    std::string path;  
     int duration;
     int sampleRate;
     int channels;
-    int length;
 
     int *samples; //Array of length [sampleRate * duration]
     arma::Mat<float> *spectrogram;
