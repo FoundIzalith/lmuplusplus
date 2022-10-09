@@ -3,6 +3,9 @@
 #include "../lmu/lmu.hpp"
 #include "soundData.hpp"
 
+#ifndef LMUPLUSPLUS_LANGIDENT
+#define LMUPLUSPLUS_LANGIDENT
+
 class languageIdentifier {
 public:
     languageIdentifier();
@@ -18,3 +21,5 @@ private:
 
     std::string outputPath; //If set, will send output to file 
 };
+
+#endif
