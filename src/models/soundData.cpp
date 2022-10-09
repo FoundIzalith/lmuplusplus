@@ -10,16 +10,20 @@ soundData::soundData() {
     sampleRate = 0;
     channels = 0;
 
+    windowSize = 20;
+
     samples = 0;
     spectrogram = 0;
 }
 
-soundData::soundData(std::string fN, std::string p, int d, int s, int c) {
+soundData::soundData(std::string fN, std::string p, int d, int s, int c, int w) {
     fileName = fN;
     path = p; 
     duration = d;
     sampleRate = s
     channels = c;
+
+    windowSize = w;
 
     samples = 0;
     spectrogram = 0;
@@ -31,6 +35,8 @@ soundData::soundData(const soundData& original) {
     duration = original.duration;
     sampleRate = original.sampleRate;
     channels = original.channels;
+
+    windowSize = original.windowSize;
 
     int totalSampleCount = sampleRate * duration;
 
@@ -53,11 +59,11 @@ void soundData::processAudio(std::string file) {
 
 }
 
-arma::Mat<float> getSpectrogram() {
+arma::Mat<float> soundData::getSpectrogram() {
     return *spectrogram;
 }
 
-void readWav() {
+void soundData::readWav() {
     std::ifstream audioFile;
     audioFile.open(path + fileName);
 
@@ -78,37 +84,37 @@ void readWav() {
         char WavSampleRate[4];
         char BitsPerSample[2];
         char Subchunk2size[4];
-        char readByte; 
+        char *readByte; 
         int bps;
         int sc2s;
 
         audioFile.read(readByte, 22);
-        NumChannels[0] = readByte;
+        NumChannels[0] = *readByte;
         audioFile.read(readByte, 23)
-        NumChannels[1] = readByte;
+        NumChannels[1] = *readByte;
 
         audioFile.read(readByte, 24);
-        WavSampleRate[0] = readByte;
+        WavSampleRate[0] = *readByte;
         audioFile.read(readByte, 25);
-        WavSampleRate[1] = readByte;
+        WavSampleRate[1] = *readByte;
         audioFile.read(readByte, 26);
-        WavSampleRate[2] = readByte;
+        WavSampleRate[2] = *readByte;
         audioFile.read(readByte, 27);
-        WavSampleRate[3] = readByte;
+        WavSampleRate[3] = *readByte;
 
         audioFile.read(readByte, 34);
-        BitsPerSample[0] = readByte;
+        BitsPerSample[0] = *readByte;
         audioFile.read(readByte, 35);
-        BitsPerSample[1] = readByte;
+        BitsPerSample[1] = *readByte;
 
         audioFile.read(readByte, 40);
-        Subchunk2size[0] = readByte;
+        Subchunk2size[0] = *readByte;
         audioFile.read(readByte, 41);
-        Subchunk2size[1] = readByte;
+        Subchunk2size[1] = *readByte;
         audioFile.read(readByte, 42);
-        Subchunk2size[2] = readByte;
+        Subchunk2size[2] = *readByte;
         audioFile.read(readByte, 43);
-        Subchunk2size[3] = readByte;
+        Subchunk2size[3] = *readByte;
 
         //First we read in all the data into arrays of chars,
         //then we can cast them into integers
@@ -124,9 +130,34 @@ void readWav() {
             samples[i] = (int)readByte;
         }
 
+        delete readByte;
+
 
     } else {
         std::cout << "ERROR: Unable to open file: " << path << fileName << std::endl;
     }
 
+}
+
+void soundData::genSpectrogram() {
+    int totalSampleCount = duration * sampleRate;
+    //Create matrix with 4300 rows (for 4300 hz) and windowSize samples per second of duration
+    spectrogram = new arma::Mat<float>(4300, duration * windowSize);
+    arma::Mat<float> temp(4300, windowSize);
+    for(int i = 0; i * windowSize < totalSampleCount; i++) {
+        temp.at()
+    }
+}
+
+soundData& soundData::operator=(const soundData& rhs) {
+    fileName = rhs.fileName;
+    path = rhs.path;
+    duration = rhs.duration;
+    sampleRate = rhs.sampleRate;
+    channels = rhs.channels;
+    windowSize = rhs.windowSize;
+
+    spectrogram = new arma::Mat<float>(*rhs.spectrogram);
+
+    return *this;
 }
