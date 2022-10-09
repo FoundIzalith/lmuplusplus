@@ -5,15 +5,22 @@
 #include "../lmu/lmu.hpp"
 
 languageIdentifier::languageIdentifier() {
-    dataset = new soundData();
+    dataset = new soundData[10]();
     lmu = new LMULayer();
+    batchSize = 10;
     outputPath = "empty";
 }
 
 languageIdentifier::languageIdentifier(const languageIdentifier& original) {
-    dataset = original.dataset;
-    lmu = new LMULayer(original->lmu);
+    lmu = new LMULayer(*original.lmu);
+    batchSize = original.batchSize;
     outputPath = original.outputPath;
+    
+    dataset = new soundData[batchSize]();
+
+    for(int i = 0; i < batchSize; i++) {
+        dataset[i] = new soundData(original.dataset[i]);
+    }
 }
 
 languageIdentifier::~languageIdentifier() {
@@ -26,5 +33,5 @@ void languageIdentifier::train(std::string datapath, std::string label) {
 }
 
 void languageIdentifier::analyze(std::string datapath) {
-    
+
 }
