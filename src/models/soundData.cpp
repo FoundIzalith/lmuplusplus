@@ -20,7 +20,7 @@ soundData::soundData(std::string fN, std::string p, int d, int s, int c, int w) 
     fileName = fN;
     path = p; 
     duration = d;
-    sampleRate = s
+    sampleRate = s;
     channels = c;
 
     windowSize = w;
@@ -78,7 +78,7 @@ void soundData::readWav() {
 
     //Duration = Subchunk2size / SampleRate * BitsPerSample
 
-    if(audioFile != NULL) {
+    if(audioFile.is_open()) {
         //This is where the magic numbers come in
         char NumChannels[2];
         char WavSampleRate[4];
@@ -90,7 +90,7 @@ void soundData::readWav() {
 
         audioFile.read(readByte, 22);
         NumChannels[0] = *readByte;
-        audioFile.read(readByte, 23)
+        audioFile.read(readByte, 23);
         NumChannels[1] = *readByte;
 
         audioFile.read(readByte, 24);
@@ -127,7 +127,7 @@ void soundData::readWav() {
         //Read data section of .wav 
         for(int i = 0; i < sc2s; i++) {
             audioFile.read(readByte, 44 + i);
-            samples[i] = (int)readByte;
+            samples[i] = (int)(size_t)readByte;
         }
 
         delete readByte;
