@@ -139,13 +139,25 @@ void soundData::readWav() {
 
 }
 
+//This function is very slow and is a prime target for optimization
+//It could also be run on its own thread 
 void soundData::genSpectrogram() {
     int totalSampleCount = duration * sampleRate;
-    //Create matrix with 4300 rows (for 4300 hz) and windowSize samples per second of duration
-    spectrogram = new arma::Mat<float>(4300, duration * windowSize);
-    arma::Mat<float> temp(4300, windowSize);
-    for(int i = 0; i * windowSize < totalSampleCount; i++) {
-        temp.at()
+    //Create matrix with 128 rows and windowSize samples per second of duration
+    spectrogram = new arma::Mat<float>(128, duration * windowSize);
+    arma::Mat<float> temp(windowSize, 1);
+    for(int i = 0; i * windowSize < totalSampleCount; i += windowSize) {
+        for(int j = 0; j < windowSize; j++) {
+            temp.at(j, 1) = samples[i + j];
+        }
+
+        temp = arma::fft(temp);
+
+        //mel = 2595 * log10(1 + freq/700) <- Convert herz to mel 
+
+        for(int j = 0; j < MAX_FREQUENCY; j++) {
+            
+        }
     }
 }
 
