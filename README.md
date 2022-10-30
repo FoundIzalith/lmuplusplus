@@ -2,8 +2,6 @@ This is an implementation of the Legendre Memory Unit using C++.
 
 The Legendre Memory Unit is a novel Recurrent Neural Network design capable of achieving very fast speeds using few resources. Unlike other RNNs, it is capable of being parallelized with some modifications. This allows us to perform complex analysis with neural networks using relatively few computational resources. 
 
-Implementing the LMU in C++ provides us to be as efficient as possible. This is essential for both large scale implementations on servers, and small scale implementations on weak hardware. 
-
 **This project is currently unfinished and does not yet function.**
 
 ## Make 
@@ -19,7 +17,8 @@ Make targets:
 * **clean**  -          Removes all generated files
 
 ## Dependencies
-Armadillo - a linear algebra and scientific computing library. Version 11.2.3
+[Armadillo](http://arma.sourceforge.net/) - a linear algebra and scientific computing library. Version 11.2.3
+
 
 ## References
 
