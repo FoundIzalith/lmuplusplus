@@ -80,9 +80,12 @@ public:
 
     void processInput(const arma::Cube<float>& input);
     void computeImpulse(); 
+    
+    std::ostream& operator<<(std::ostream&);
 
 protected:
-    arma::Mat<float> *matrixA, *matrixB, *matrixH, *hFFT;
+    arma::Mat<float> *matrixA, *matrixB, *matrixH, 
+                     *hFFT, *memoryVector, *hiddenState;
 
     //Parameters
     int inputSize; //Size of input vector
@@ -100,5 +103,11 @@ void discretizeMatrices(arma::Mat<float>*, arma::Mat<float>*, int);
 float reLU(float);
 void LeCunUniform(arma::Mat<float>&, int size);
 void xavierInit(arma::Mat<float>&, int rows, int cols);
+
+//Python bindings 
+extern "C" {
+    unsigned int LMUInit(int, int, int, int);
+    
+}
 
 #endif 
